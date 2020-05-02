@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: '0 12 * * *'
+    - cron: '0 13 * * *'
 
 name: Create nightly build and upload binaries
 
@@ -24,7 +24,14 @@ jobs:
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
 
-          BUILD_NUMBER="v0.0.0-nightly$(date +%Y%m%d)"
           REMOTE="git@github.com:${GITHUB_REPOSITORY}.git"
+
+          PUSH_OUT="$(git push -f "$REMOTE" master:latest)"
+          if [ "$PUSH_OUT" = "Everything up-to-date" ]
+          then
+            exit 0
+          fi
+
+          BUILD_NUMBER="v0.0.0-nightly$(date +%Y%m%d)"
           git tag "$BUILD_NUMBER"
           git push "$REMOTE" "$BUILD_NUMBER"
