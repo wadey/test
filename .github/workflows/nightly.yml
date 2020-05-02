@@ -1,12 +1,12 @@
 on:
   schedule:
-    - cron: '40 11 * * *'
+    - cron: '55 11 * * *'
 
 name: Create nightly build and upload binaries
 
 jobs:
-  build-linux:
-    name: Build Linux All
+  tag-nightly:
+    name: Tag nightly
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -17,7 +17,13 @@ jobs:
 
       - name: Build
         run: |
+          mkdir -p ~/.ssh
+          chmod 600 ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" >~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
+
           BUILD_NUMBER="v0.0.0-nightly$(date +%Y%m%d)"
-          REMOTE="https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
+          REMOTE="git@github.com:${GITHUB_REPOSITORY}.git"
           git tag "$BUILD_NUMBER"
           git push "$REMOTE" "$BUILD_NUMBER"
