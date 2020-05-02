@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: '30 11 * * *'
+    - cron: '40 11 * * *'
 
 name: Create nightly build and upload binaries
 
@@ -13,6 +13,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'slackhq/nebula'
+          fetch-depth: 0
 
       - name: Build
         run: |
