@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: '55 11 * * *'
+    - cron: '0 12 * * *'
 
 name: Create nightly build and upload binaries
 
@@ -18,8 +18,9 @@ jobs:
       - name: Build
         run: |
           mkdir -p ~/.ssh
-          chmod 600 ~/.ssh
+          chmod 700 ~/.ssh
           echo "${{ secrets.DEPLOY_KEY }}" >~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
 
