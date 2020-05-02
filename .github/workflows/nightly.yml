@@ -28,6 +28,12 @@ jobs:
 
           git fetch --tags
           LATEST="$(git describe --tags --long --match 'v[0-9]*' --exclude '*-*' | cut -d- -f 1)"
+          if [ -z "$LATEST" ]
+          then
+            echo "failed to find latest tag" >&2
+            exit 1
+          fi
+
           MAJOR_MINOR="$(echo "$LATEST" | cut -d. -f 1-2)"
           PATCH="$(echo "$LATEST" | cut -d. -f 3)"
           NEXT="$MAJOR_MINOR.$((PATCH + 1))"
