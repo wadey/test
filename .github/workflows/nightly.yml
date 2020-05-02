@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: '35 16 * * *'
+    - cron: '45 16 * * *'
 
 name: Tag nightly
 
@@ -26,10 +26,11 @@ jobs:
 
           REMOTE="git@github.com:${GITHUB_REPOSITORY}.git"
 
+          git fetch --tags
           LATEST="$(git describe --tags --long --match 'v[0-9]*' --exclude '*-*' | cut -d- -f 1)"
           MAJOR_MINOR="$(echo "$LATEST" | cut -d. -f 1-2)"
           PATCH="$(echo "$LATEST" | cut -d. -f 3)"
-          NEXT="$(MAJOR_MINOR).$((PATCH + 1))"
+          NEXT="$MAJOR_MINOR.$((PATCH + 1))"
 
           PUSH_OUT="$(git push -f "$REMOTE" "master:nightly-$NEXT")"
           if [ "$PUSH_OUT" = "Everything up-to-date" ]
