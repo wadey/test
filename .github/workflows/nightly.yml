@@ -34,7 +34,7 @@ jobs:
           PATCH="$(echo "$LATEST" | cut -d. -f 3)"
           NEXT="$MAJOR_MINOR.$((PATCH + 1))"
 
-          PUSH_OUT="$(git push -f "$REMOTE" "master:nightly-$NEXT")"
+          PUSH_OUT="$(git push -f "$REMOTE" "master:nightly-$NEXT" 2>&1)"
           if [ "$PUSH_OUT" = "Everything up-to-date" ]
           then
             exit 0
