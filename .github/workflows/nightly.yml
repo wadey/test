@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '0 1 * * *'
 
 name: Tag nightly
 
@@ -20,9 +20,9 @@ jobs:
           eval "$(ssh-agent -s)"
           ssh-add - <<< "${{ secrets.DEPLOY_KEY }}"
 
-          REMOTE="git@github.com:${GITHUB_REPOSITORY}.git"
+          git remote add nightly "git@github.com:${GITHUB_REPOSITORY}.git"
 
-          git fetch --tags
+          git fetch --all --tags
           LATEST="$(git describe --tags --long --match 'v[0-9]*' --exclude '*-*' | cut -d- -f 1)"
           if [ -z "$LATEST" ]
           then
@@ -34,12 +34,18 @@ jobs:
           PATCH="$(echo "$LATEST" | cut -d. -f 3)"
           NEXT="$MAJOR_MINOR.$((PATCH + 1))"
 
-          PUSH_OUT="$(git push -f "$REMOTE" "master:nightly-$NEXT" 2>&1)"
-          if [ "$PUSH_OUT" = "Everything up-to-date" ]
+
+          # don't build if we already have built this SHA for the same patch version
+          BRANCH="nightly-$NEXT"
+          if NIGHTLY_SHA="$(git rev-parse --quiet --verify "nightly/$BRANCH")"
           then
-            exit 0
+            if [ "$NIGHTLY_SHA" = "$(git rev-parse --quiet --verify HEAD)" ]
+            then
+              echo "we already built $NIGHTLY_SHA as $BRANCH, skipping tonight's nightly build"
+              exit 0
+            fi
           fi
 
-          BUILD_NUMBER="$NEXT-nightly$(date +%Y%m%d)"
-          git tag "$BUILD_NUMBER"
-          git push "$REMOTE" "$BUILD_NUMBER"
+          TAG="$NEXT-nightly$(date +%Y%m%d)"
+          git tag "$TAG"
+          git push nightly "$TAG"
