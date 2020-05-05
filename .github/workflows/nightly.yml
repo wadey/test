@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: '30 14 * * *'
+    - cron: '50 14 * * *'
 
 name: Tag nightly
 
@@ -48,4 +48,4 @@ jobs:
 
           TAG="$NEXT-nightly$(date +%Y%m%d)"
           git tag "$TAG"
-          git push nightly "$BRANCH" "$TAG"
+          git push nightly "HEAD:$BRANCH" "$TAG"
