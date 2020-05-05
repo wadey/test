@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: '0 12 * * *'
+    - cron: '20 13 * * *'
 
 name: Tag nightly
 
@@ -21,8 +21,9 @@ jobs:
           ssh-add - <<< "${{ secrets.DEPLOY_KEY }}"
 
           git remote add nightly "git@github.com:${GITHUB_REPOSITORY}.git"
+          git fetch --tags origin
+          git fetch nightly
 
-          git fetch --all --tags
           LATEST="$(git describe --tags --long --match 'v[0-9]*' --exclude '*-*' | cut -d- -f 1)"
           if [ -z "$LATEST" ]
           then
@@ -33,7 +34,6 @@ jobs:
           MAJOR_MINOR="$(echo "$LATEST" | cut -d. -f 1-2)"
           PATCH="$(echo "$LATEST" | cut -d. -f 3)"
           NEXT="$MAJOR_MINOR.$((PATCH + 1))"
-
 
           # don't build if we already have built this SHA for the same patch version
           BRANCH="nightly-$NEXT"
