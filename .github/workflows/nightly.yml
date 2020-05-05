@@ -48,4 +48,4 @@ jobs:
 
           TAG="$NEXT-nightly$(date +%Y%m%d)"
           git tag "$TAG"
-          git push nightly "$TAG"
+          git push nightly "$BRANCH" "$TAG"
