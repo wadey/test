@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: '20 13 * * *'
+    - cron: '0 14 * * *'
 
 name: Tag nightly
 
@@ -22,7 +22,7 @@ jobs:
 
           git remote add nightly "git@github.com:${GITHUB_REPOSITORY}.git"
           git fetch --tags origin
-          git fetch nightly
+          git fetch --no-tags nightly
 
           LATEST="$(git describe --tags --long --match 'v[0-9]*' --exclude '*-*' | cut -d- -f 1)"
           if [ -z "$LATEST" ]
